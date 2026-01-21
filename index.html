@@ -1,126 +1,235 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
-    <meta charset="UTF-8">
-    <title>GymTinder</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>GymTinder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #020617, #0f172a);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
+:root {
+    --bg: #020617;
+    --card: #1e293b;
+    --accent: #22c55e;
+    --danger: #ef4444;
+    --muted: #94a3b8;
+}
 
-        .app {
-            background: #020617;
-            width: 320px;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            text-align: center;
-        }
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
 
-        h1 {
-            margin-bottom: 20px;
-        }
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        .card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+/* Phone frame */
+.app {
+    width: 375px;
+    height: 700px;
+    background: #020617;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+}
 
-        .card h2 {
-            margin: 0 0 10px 0;
-        }
+/* Header */
+.header {
+    padding: 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+    border-bottom: 1px solid #1e293b;
+    color: white;
+}
 
-        .card p {
-            margin: 5px 0;
-            opacity: 0.9;
-        }
+/* Cards area */
+.cards {
+    flex: 1;
+    position: relative;
+    padding: 16px;
+}
 
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-        }
+.card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--card);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
 
-        button {
-            width: 48%;
-            font-size: 20px;
-            padding: 12px 0;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.1s ease;
-        }
+.card img {
+    width: 100%;
+    height: 60%;
+    object-fit: cover;
+}
 
-        button:hover {
-            transform: scale(1.05);
-        }
+.card-content {
+    padding: 16px;
+    color: white;
+}
 
-        .no {
-            background: #ef4444;
-            color: white;
-        }
+.card-content h2 {
+    margin: 0;
+    font-size: 26px;
+}
 
-        .yes {
-            background: #22c55e;
-            color: white;
-        }
-    </style>
+.card-content p {
+    margin: 6px 0;
+    color: var(--muted);
+}
+
+/* Action buttons */
+.actions {
+    display: flex;
+    justify-content: space-around;
+    padding: 14px 0;
+}
+
+.action-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.no { background: var(--danger); }
+.yes { background: var(--accent); }
+
+/* Bottom nav */
+.nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #1e293b;
+    color: var(--muted);
+}
+
+.nav span {
+    font-size: 22px;
+}
+
+/* Match overlay */
+.match {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 28px;
+    z-index: 10;
+}
+</style>
 </head>
+
 <body>
 
 <div class="app">
-    <h1>🏋️ GymTinder</h1>
+    <div class="header">🏋️ GymTinder</div>
 
-    <div class="card" id="profile">
-        <h2 id="name">Alex, 22</h2>
-        <p id="goal">Mål: Bygge muskler 💪</p>
-        <p id="level">Nivå: Viderekommen</p>
+    <div class="cards" id="cards"></div>
+
+    <div class="actions">
+        <button class="action-btn no" onclick="swipe('left')">❌</button>
+        <button class="action-btn yes" onclick="swipe('right')">❤️</button>
     </div>
 
-    <div class="buttons">
-        <button class="no" onclick="skip()">❌</button>
-        <button class="yes" onclick="like()">❤️</button>
+    <div class="nav">
+        <span>🏠</span>
+        <span>🔥</span>
+        <span>💬</span>
+        <span>👤</span>
     </div>
+
+    <div class="match" id="match">🎉 IT'S A MATCH!</div>
 </div>
 
 <script>
-    const profiles = [
-        { name: "Alex, 22", goal: "Bygge muskler 💪", level: "Viderekommen" },
-        { name: "Sara, 20", goal: "Kondisjon 🏃‍♀️", level: "Nybegynner" },
-        { name: "Jonas, 25", goal: "Styrke 🏋️", level: "Avansert" }
-    ];
+const profiles = [
+    {
+        name: "Alex, 22",
+        goal: "Bygge muskler 💪",
+        level: "Viderekommen",
+        image: "https://images.unsplash.com/photo-1599058917212-d750089bc07c"
+    },
+    {
+        name: "Sara, 20",
+        goal: "Kondisjon 🏃‍♀️",
+        level: "Nybegynner",
+        image: "https://images.unsplash.com/photo-1594737625785-c91a19f47b21"
+    },
+    {
+        name: "Jonas, 25",
+        goal: "Styrke 🏋️",
+        level: "Avansert",
+        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b"
+    }
+];
 
-    let index = 0;
+const cardsContainer = document.getElementById("cards");
+const matchOverlay = document.getElementById("match");
+let index = 0;
 
-    function updateProfile() {
-        document.getElementById("name").innerText = profiles[index].name;
-        document.getElementById("goal").innerText = "Mål: " + profiles[index].goal;
-        document.getElementById("level").innerText = "Nivå: " + profiles[index].level;
+function createCard(profile) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+        <img src="${profile.image}">
+        <div class="card-content">
+            <h2>${profile.name}</h2>
+            <p>Mål: ${profile.goal}</p>
+            <p>Nivå: ${profile.level}</p>
+        </div>
+    `;
+    return card;
+}
+
+function loadCards() {
+    cardsContainer.innerHTML = "";
+    for (let i = index; i < Math.min(index + 2, profiles.length); i++) {
+        const card = createCard(profiles[i]);
+        card.style.zIndex = profiles.length - i;
+        cardsContainer.appendChild(card);
+    }
+}
+
+function swipe(direction) {
+    const card = cardsContainer.firstChild;
+    if (!card) return;
+
+    card.style.transform = direction === "right"
+        ? "translateX(500px) rotate(20deg)"
+        : "translateX(-500px) rotate(-20deg)";
+    card.style.opacity = 0;
+
+    if (direction === "right") {
+        matchOverlay.style.display = "flex";
+        setTimeout(() => matchOverlay.style.display = "none", 1200);
     }
 
-    function like() {
-        alert("Match! 🔥 Klar for økt?");
-        nextProfile();
-    }
+    setTimeout(() => {
+        index++;
+        if (index >= profiles.length) index = 0;
+        loadCards();
+    }, 300);
+}
 
-    function skip() {
-        nextProfile();
-    }
-
-    function nextProfile() {
-        index = (index + 1) % profiles.length;
-        updateProfile();
-    }
+loadCards();
 </script>
 
 </body>
