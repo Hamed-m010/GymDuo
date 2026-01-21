@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>GymTinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .app {
+            background: #020617;
+            width: 320px;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+        }
+
+        .card p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            width: 48%;
+            font-size: 20px;
+            padding: 12px 0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .no {
+            background: #ef4444;
+            color: white;
+        }
+
+        .yes {
+            background: #22c55e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <h1>🏋️ GymTinder</h1>
+
+    <div class="card" id="profile">
+        <h2 id="name">Alex, 22</h2>
+        <p id="goal">Mål: Bygge muskler 💪</p>
+        <p id="level">Nivå: Viderekommen</p>
+    </div>
+
+    <div class="buttons">
+        <button class="no" onclick="skip()">❌</button>
+        <button class="yes" onclick="like()">❤️</button>
+    </div>
+</div>
+
+<script>
+    const profiles = [
+        { name: "Alex, 22", goal: "Bygge muskler 💪", level: "Viderekommen" },
+        { name: "Sara, 20", goal: "Kondisjon 🏃‍♀️", level: "Nybegynner" },
+        { name: "Jonas, 25", goal: "Styrke 🏋️", level: "Avansert" }
+    ];
+
+    let index = 0;
+
+    function updateProfile() {
+        document.getElementById("name").innerText = profiles[index].name;
+        document.getElementById("goal").innerText = "Mål: " + profiles[index].goal;
+        document.getElementById("level").innerText = "Nivå: " + profiles[index].level;
+    }
+
+    function like() {
+        alert("Match! 🔥 Klar for økt?");
+        nextProfile();
+    }
+
+    function skip() {
+        nextProfile();
+    }
+
+    function nextProfile() {
+        index = (index + 1) % profiles.length;
+        updateProfile();
+    }
+</script>
+
+</body>
+</html>
